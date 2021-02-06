@@ -46,6 +46,7 @@ class Link_Cut_Tree {
             Rev(x);
         }
         // æå–è¾¹  å•ç‹¬æ‹å‡ºæ¥
+        // SplitÊ±·´×ªyµ½ÁË¶¥¶Ë  ÇÒ¸üĞÂºÃÁË  ´ËÊ±y´¢´æµÄ¾ÍÊÇÕâÌõÁ´ĞÅÏ¢
         inline void Split(int x, int y) {
             makeroot(x);
             Access(y); Splay(y);
@@ -68,16 +69,16 @@ class Link_Cut_Tree {
                 push_up(x);
             }
         }
+        // ç»´æŠ¤ä¿¡æ¯
+        inline void push_up(int x) {
+            sum[x] = (sum[ls(x)] ^ sum[rs(x)] ^ val[x]);
+        }
     private :
         int Fa[MAX], son[MAX][2], revtag[MAX];
         // åˆ¤æ–­æ˜¯å¦ä¸º splay çš„æ ¹  åªéœ€çˆ¶äº²èŠ‚ç‚¹ä¸å«è¿™ä¸ªå„¿å­å³å¯
         // å³çˆ¶å­è¾¹ä¸ºè™š
         inline bool isroot(int x) {
             return ls(Fa[x]) != x && rs(Fa[x]) != x;
-        }
-        // ç»´æŠ¤ä¿¡æ¯
-        inline void push_up(int x) {
-            sum[x] = (sum[ls(x)] ^ sum[rs(x)] ^ val[x]);
         }
         // æ¢æ ¹ååè½¬ splay ç»´æŒæ€§è´¨
         inline void Rev(int x) {
@@ -142,6 +143,7 @@ int main () {
     while(m --) {
         int op, x, y; scanf("%d %d %d", &op, &x, &y);
         // æŸ¥è¯¢ x~y  å¼‚æˆ–ä¹‹å’Œ
+        // SplitÊ±·´×ªyµ½ÁË¶¥¶Ë  ÇÒ¸üĞÂºÃÁË  ´ËÊ±y´¢´æµÄ¾ÍÊÇÕâÌõÁ´ĞÅÏ¢
         if(op == 0) {
             LCT.Split(x, y);
             printf("%d\n", LCT.sum[y]);
@@ -155,6 +157,7 @@ int main () {
             //  ä¿®æ”¹ç‚¹x
             LCT.Splay(x);
             LCT.val[x] = y;
+            LCT.push_up(x); 
         }
     }
     #ifdef iyua
