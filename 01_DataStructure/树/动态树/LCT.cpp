@@ -8,6 +8,24 @@ using namespace std;
     1. 开链
     2. 断链
     3. 修改点权
+    
+    对于维护边，可以将一条边映射为一个点  例如<u, v>
+    改成 <u, id>  <id, v> 这样就用点权表示出了边权
+    常用套路是维护一条链上 max/min 那个边的点id值（注意维护的是下标不是权值）
+    id为代表哪条边
+    然后动态割开/合并
+    常用来动态维护生成树, 记录最大最小边权的下标，之后动态加边时定位下标到那条边
+    之后cut掉  再link新边
+
+    若题目保证不含删边操作 请使用并查集维护根而不是 Findroot()
+    Findroot() 常数大  可能会TLE
+
+    准确来说不是不含删边  而是在同一个集合内之后保证不会分离  就可以使用并查集了
+    例如 UOJ THU集训2016  《温暖会指引我们前行》
+    https://uoj.ac/problem/274
+
+    but 如果是询问一条边是否存在  那么在一个集合内也不行  
+    可能会破开  这时候要用Findroot
 */
 #define ls(x)   son[x][0]
 #define rs(x)   son[x][1]
@@ -19,6 +37,8 @@ class Link_Cut_Tree {
         // 栈  splay要从上往下放标记， 所以单独开的栈来push_down
         int sta[MAX], top;
         inline void clear(int n) {
+        // 注意这里清空是从0开始的  如果初始化每个点权值并不是1这种问题
+        // 则需从1开始清，0点单独清，因为0时空节点，给0赋值会导致统计出错
             for (int i = 0; i <= n; ++ i) {
                 val[i] = sum[i] = 0;
                 revtag[i] = 0;
@@ -59,6 +79,8 @@ class Link_Cut_Tree {
         // 连边
         inline void Link(int x, int y) {
             makeroot(x);
+            // 写成 fa[x] = y 
+            // 因为此时x是根  一定无父节点 所以不会出错
             if(findroot(y) != x) Fa[x] = y;
         }
         // 断边
@@ -69,6 +91,8 @@ class Link_Cut_Tree {
                 push_up(x);
             }
         }
+        // 若边一定存在
+        // 可以直接  split(x, y)  Fa[x] = ls(y) = 0   push_up(y)
     	// 维护信息
         inline void push_up(int x) {
             sum[x] = (sum[ls(x)] ^ sum[rs(x)] ^ val[x]);
